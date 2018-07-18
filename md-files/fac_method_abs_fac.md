@@ -1,21 +1,14 @@
-<!-- date -->
-31.01.2018
-<!-- title -->
-Simple Factory, Factory Method и Abstract Factory
-<!-- meta_keywords -->
-static site generator, simple static site, github pages
-<!-- meta_description -->
-Your first blog post here
-<!-- content -->
+<!--date 31.01.2018-->
+<!--title Simple Factory, Factory Method и Abstract Factory-->
+<!--meta_description Паттерны проектирования Simple Factory, Factory Method и Abstract Factory часто путают между собой. Рассмотрим отличия и особенности применения каждого из них.-->
+
 Simple Factory, Factory Method и Abstract Factory - это паттерны 
 проектирования, то есть решения каких-то конкретных проблем проектирования 
 программ.
 
 > Все рассказы серии:
-> * [Simple Factory, Factory Method и Abstract Factory](/posts/simple-factory-factory-method-i-abstract-factory)
-> * Bridge
-> * Decorator
-> * Strategy
+> * Simple Factory, Factory Method и Abstract Factory
+> * [Decorator](/pages/decorator)
 
 И Simple Factory, и Factory Method, и Abstract Factory относятся к порождающим 
 паттернам, то есть к паттернам, отвечающим за создание объектов.

@@ -1,0 +1,238 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Паттерны проектирования Simple Factory, Factory Method и Abstract Factory часто путают между собой. Рассмотрим отличия и особенности применения каждого из них.">
+    <title>DSSSG Blog</title>
+    <link rel="shortcut icon" type="image/png" href="/imgs/favicon.png"/>
+    <link href='/theme/normalize.css' rel='stylesheet' type='text/css'>
+    <link href='/theme/style.css' rel='stylesheet' type='text/css'>
+    </head>
+    <body>
+        <div id="header" class="page-header">
+            <a href="/"><img alt="Cool Image" src="/imgs/logo.jpg"></a>
+            <span class="tooltip">Больше статей!</span>
+            <h1>Simple Factory, Factory Method и Abstract Factory</h1>
+        </div>
+        <hr>
+        <div id="post-body"><p>Simple Factory, Factory Method и Abstract Factory - это паттерны 
+проектирования, то есть решения каких-то конкретных проблем проектирования 
+программ.</p>
+<blockquote><p>Все рассказы серии:</p>
+<ul>
+<li>Simple Factory, Factory Method и Abstract Factory</li>
+<li><a href="/pages/decorator">Decorator</a></li>
+</ul>
+</blockquote>
+<p>И Simple Factory, и Factory Method, и Abstract Factory относятся к порождающим 
+паттернам, то есть к паттернам, отвечающим за создание объектов.</p>
+<p>Первым мы рассмотрим паттерн Simple Factory, так как он самый простой и поможет
+понять нам другие паттерны этой статьи.</p>
+<h2>Simple Factory</h2>
+<p>Пусть у нас есть игра, в которой есть монстры-вампиры и они могут сражаться с
+главным героем. Тогда код нашей игры будет выглядеть как-то так:</p>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #008000; font-weight: bold">struct</span> Vampire {
+    <span style="color: #B00040">void</span> fight(){
+        std<span style="color: #666666">::</span>cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Vampire is fighting&quot;</span> <span style="color: #666666">&lt;&lt;</span> std<span style="color: #666666">::</span>endl;
+    }
+};
+
+<span style="color: #B00040">int</span> <span style="color: #0000FF">main</span>(){
+    <span style="color: #008000; font-weight: bold">auto</span> monster <span style="color: #666666">=</span> Vampire{};
+    monster.fight();
+
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #666666">0</span>;
+}
+</pre></div>
+<p>Чем плох этот код?</p>
+<ol>
+<li>Если мы захотим заменить имя класса <code>Vampire</code> на более подходящее, скажем,
+<code>RedVampire</code> то нам придется делать замену имени во всем коде.</li>
+<li>Пусть у нас был класс <code>Vampire{}</code>, но мы изменили его конструктор и теперь он
+принимает аргументом величину здоровья <code>Vampire{100}</code>, тогда по всему коду
+опять придется искать и менять.</li>
+</ol>
+<p>Чтобы показать, что паттерн <em>Simple Factory</em> решает эти проблемы, добавим в нашу
+игру вервольфов, отнаследовав от общего интерфейса монстров.</p>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #008000; font-weight: bold">struct</span> Monster {
+    <span style="color: #008000; font-weight: bold">virtual</span> <span style="color: #B00040">void</span> fight() <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+};
+<span style="color: #008000; font-weight: bold">struct</span> <span style="color: #A0A000">Vampire</span> : Monster{
+    <span style="color: #B00040">void</span> fight(){
+        std<span style="color: #666666">::</span>cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Vampire is fighting&quot;</span> <span style="color: #666666">&lt;&lt;</span> std<span style="color: #666666">::</span>endl;
+    }
+};
+<span style="color: #008000; font-weight: bold">struct</span> <span style="color: #A0A000">Werewolf</span> : Monster{
+    <span style="color: #B00040">void</span> fight(){
+        std<span style="color: #666666">::</span>cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Werewolf is fighting&quot;</span> <span style="color: #666666">&lt;&lt;</span> std<span style="color: #666666">::</span>endl;
+    }
+};
+</pre></div>
+<p>Итак, о самом паттерне. <strong>Паттерн Simple Factory</strong> определяет класс, в котором
+есть метод создающий объекты разного типа в зависимости от аргумента этого
+метода.</p>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #008000; font-weight: bold">struct</span> MonsterFactory {
+    std<span style="color: #666666">::</span>unique_ptr<span style="color: #666666">&lt;</span>Monster<span style="color: #666666">&gt;</span> createMonster(std<span style="color: #666666">::</span>string monster_type){
+        <span style="color: #008000; font-weight: bold">if</span> (monster_type <span style="color: #666666">==</span> <span style="color: #BA2121">&quot;vampire&quot;</span>)
+            <span style="color: #008000; font-weight: bold">return</span> std<span style="color: #666666">::</span>make_unique<span style="color: #666666">&lt;</span>Vampire<span style="color: #666666">&gt;</span>();
+        <span style="color: #008000; font-weight: bold">else</span> <span style="color: #0000FF">if</span> (monster_type <span style="color: #666666">==</span> <span style="color: #BA2121">&quot;werewolf&quot;</span>)
+            <span style="color: #008000; font-weight: bold">return</span> std<span style="color: #666666">::</span>make_unique<span style="color: #666666">&lt;</span>Werewolf<span style="color: #666666">&gt;</span>();
+        <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000; font-weight: bold">nullptr</span>;
+    }
+};
+
+<span style="color: #B00040">int</span> <span style="color: #0000FF">main</span>(){
+    MonsterFactory monster_factory;
+    <span style="color: #008000; font-weight: bold">auto</span> monster <span style="color: #666666">=</span> monster_factory.createMonster(<span style="color: #BA2121">&quot;werewolf&quot;</span>);
+    <span style="color: #008000; font-weight: bold">if</span> (monster <span style="color: #666666">!=</span> <span style="color: #008000; font-weight: bold">nullptr</span>){
+        monster<span style="color: #666666">-&gt;</span>fight();
+    }
+
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #666666">0</span>;
+}
+</pre></div>
+<p>Выше были указаны две проблемы, которые возникают при непосредственном создании
+объектов классов. Посмотрим, как они были разрешены при использовании паттерна
+Simple Factory:</p>
+<ol>
+<li>Как можно видеть, если мы изменим имя класса <code>Vampire</code> на более подходящее
+<code>RedVampire</code>, то нам нужно будет изменить всего одну строчку в createMonster()</li>
+<li>То же самое и с конструктором</li>
+<li><em>Как бонус</em> мы получили возможность выбора класса для создания объекта во
+время работы программы. Например, мы могли попросить пользователя ввести, какого
+монстра создать, или сделать выбор случайным  образом.</li>
+</ol>
+<h2>Factory Method</h2>
+<p>Но у паттерна Simple Factory есть и большой недостаток: он нарушает <a href="https://ru.wikipedia.org/wiki/Принцип_открытости/закрытости">принцип
+открытости/закрытости</a>.</p>
+<p>Когда мы добавляли поддержку класса Werewolf в программу, то изменяли логику
+работы старого кода. На месте нашего игрушечного примера могло бы быть что-то
+более сложное - объекты классов бы порождались совсем нетривиально. И что-то
+могло бы сломаться. Это и есть нарушение принципа открытости/закрытости.</p>
+<p>Нам нужно добавлять функциональность в виде классов, что и предлагает делать
+паттерн Factory Method.</p>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #008000; font-weight: bold">struct</span> Monster {
+    <span style="color: #008000; font-weight: bold">virtual</span> <span style="color: #B00040">void</span> fight() <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+};
+<span style="color: #008000; font-weight: bold">struct</span> <span style="color: #A0A000">Vampire</span> : Monster{
+    <span style="color: #B00040">void</span> fight(){
+        std<span style="color: #666666">::</span>cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Vampire is fighting&quot;</span> <span style="color: #666666">&lt;&lt;</span> std<span style="color: #666666">::</span>endl;
+    }
+};
+<span style="color: #008000; font-weight: bold">struct</span> <span style="color: #A0A000">Werewolf</span> : Monster{
+    <span style="color: #B00040">void</span> fight(){
+        std<span style="color: #666666">::</span>cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Werewolf is fighting&quot;</span> <span style="color: #666666">&lt;&lt;</span> std<span style="color: #666666">::</span>endl;
+    }
+};
+
+<span style="color: #008000; font-weight: bold">struct</span> MonsterFactory {
+    <span style="color: #008000; font-weight: bold">virtual</span> std<span style="color: #666666">::</span>unique_ptr<span style="color: #666666">&lt;</span>Monster<span style="color: #666666">&gt;</span> createMonster() <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+};
+
+<span style="color: #008000; font-weight: bold">struct</span> <span style="color: #A0A000">VampireFactory</span> : MonsterFactory {
+    <span style="color: #008000; font-weight: bold">virtual</span> std<span style="color: #666666">::</span>unique_ptr<span style="color: #666666">&lt;</span>Monster<span style="color: #666666">&gt;</span> createMonster(){
+        <span style="color: #008000; font-weight: bold">return</span> std<span style="color: #666666">::</span>make_unique<span style="color: #666666">&lt;</span>Vampire<span style="color: #666666">&gt;</span>();
+    }
+};
+
+<span style="color: #008000; font-weight: bold">struct</span> <span style="color: #A0A000">WerewolfFactory</span> : MonsterFactory {
+    <span style="color: #008000; font-weight: bold">virtual</span> std<span style="color: #666666">::</span>unique_ptr<span style="color: #666666">&lt;</span>Monster<span style="color: #666666">&gt;</span> createMonster(){
+        <span style="color: #008000; font-weight: bold">return</span> std<span style="color: #666666">::</span>make_unique<span style="color: #666666">&lt;</span>Werewolf<span style="color: #666666">&gt;</span>();
+    }
+};
+
+<span style="color: #B00040">int</span> <span style="color: #0000FF">main</span>(){
+    <span style="color: #008000; font-weight: bold">auto</span> factory <span style="color: #666666">=</span> WerewolfFactory{};
+    <span style="color: #008000; font-weight: bold">auto</span> monster <span style="color: #666666">=</span> factory.createMonster();
+    monster<span style="color: #666666">-&gt;</span>fight();
+
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #666666">0</span>;
+}
+</pre></div>
+<h2>Abstract Factory</h2>
+<p>Abstract Factory - это почти фабричный метод. Только здесь классы Factory
+имеют несколько методов создания объектов, а не один.</p>
+<p>Зачем это может быть нужно? Это может быть нужно, если мы хотим порождать
+объекты как-то связанные между собой, <em>объекты одной группы</em>. 
+Поэтому порождающие их методы и выносят в одну фабрику.</p>
+<p>Для нашего примера с монстрами трудно придумать использование Abstract Factory,
+поэтому разберем новый пример.</p>
+<p>Пусть у нас есть графическое приложение, которое должно работать и в Windows, и
+в MacOS. Эти операционные системы совершенно разные, значит коды отрисовки
+кнопок и текстовых полей тоже будут различаться.</p>
+<p>Имеем классы кнопок и текстовых полей объявленные как:</p>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #008000; font-weight: bold">struct</span> Button {
+    <span style="color: #008000; font-weight: bold">virtual</span> <span style="color: #B00040">void</span> draw() <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+};
+<span style="color: #008000; font-weight: bold">struct</span> <span style="color: #A0A000">WindowsButton</span> : Button {
+    <span style="color: #B00040">void</span> draw(){
+        std<span style="color: #666666">::</span>cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Rendering Windows button&quot;</span> <span style="color: #666666">&lt;&lt;</span> std<span style="color: #666666">::</span>endl;
+    }
+};
+<span style="color: #008000; font-weight: bold">struct</span> <span style="color: #A0A000">MacOSButton</span> : Button {
+    <span style="color: #B00040">void</span> draw(){
+        std<span style="color: #666666">::</span>cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Rendering MacOS button&quot;</span> <span style="color: #666666">&lt;&lt;</span> std<span style="color: #666666">::</span>endl;
+    }
+};
+
+<span style="color: #008000; font-weight: bold">struct</span> TextBox {
+    <span style="color: #008000; font-weight: bold">virtual</span> <span style="color: #B00040">void</span> draw() <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+};
+<span style="color: #008000; font-weight: bold">struct</span> <span style="color: #A0A000">WindowsTextBox</span> : TextBox {
+    <span style="color: #B00040">void</span> draw(){
+        std<span style="color: #666666">::</span>cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Rendering Windows textbox&quot;</span> <span style="color: #666666">&lt;&lt;</span> std<span style="color: #666666">::</span>endl;
+    }
+};
+<span style="color: #008000; font-weight: bold">struct</span> <span style="color: #A0A000">MacOSTextBox</span> : TextBox {
+    <span style="color: #B00040">void</span> draw(){
+        std<span style="color: #666666">::</span>cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Rendering MacOS textbox&quot;</span> <span style="color: #666666">&lt;&lt;</span> std<span style="color: #666666">::</span>endl;
+    }
+};
+</pre></div>
+<p>Тогда пусть WindowsGUIFactory производит кнопки и текстовые поля для Windows, а
+MacOSGUIFactory производит кнопки и текстовые поля для MacOS:</p>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #008000; font-weight: bold">struct</span> GUIFactory {
+    <span style="color: #008000; font-weight: bold">virtual</span> std<span style="color: #666666">::</span>unique_ptr<span style="color: #666666">&lt;</span>Button<span style="color: #666666">&gt;</span> createButton() <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+    <span style="color: #008000; font-weight: bold">virtual</span> std<span style="color: #666666">::</span>unique_ptr<span style="color: #666666">&lt;</span>TextBox<span style="color: #666666">&gt;</span> createTextBox() <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+};
+<span style="color: #008000; font-weight: bold">struct</span> <span style="color: #A0A000">WindowsGUIFactory</span> : GUIFactory {
+    std<span style="color: #666666">::</span>unique_ptr<span style="color: #666666">&lt;</span>Button<span style="color: #666666">&gt;</span> createButton(){
+        <span style="color: #008000; font-weight: bold">return</span> std<span style="color: #666666">::</span>make_unique<span style="color: #666666">&lt;</span>WindowsButton<span style="color: #666666">&gt;</span>();
+    }
+    std<span style="color: #666666">::</span>unique_ptr<span style="color: #666666">&lt;</span>TextBox<span style="color: #666666">&gt;</span> createTextBox(){
+        <span style="color: #008000; font-weight: bold">return</span> std<span style="color: #666666">::</span>make_unique<span style="color: #666666">&lt;</span>WindowsTextBox<span style="color: #666666">&gt;</span>();
+    }
+};
+<span style="color: #008000; font-weight: bold">struct</span> <span style="color: #A0A000">MacOSGUIFactory</span> : GUIFactory {
+    std<span style="color: #666666">::</span>unique_ptr<span style="color: #666666">&lt;</span>Button<span style="color: #666666">&gt;</span> createButton(){
+        <span style="color: #008000; font-weight: bold">return</span> std<span style="color: #666666">::</span>make_unique<span style="color: #666666">&lt;</span>MacOSButton<span style="color: #666666">&gt;</span>();
+    }
+    std<span style="color: #666666">::</span>unique_ptr<span style="color: #666666">&lt;</span>TextBox<span style="color: #666666">&gt;</span> createTextBox(){
+        <span style="color: #008000; font-weight: bold">return</span> std<span style="color: #666666">::</span>make_unique<span style="color: #666666">&lt;</span>MacOSTextBox<span style="color: #666666">&gt;</span>();
+    }
+};
+
+<span style="color: #B00040">int</span> <span style="color: #0000FF">main</span>(){
+    <span style="color: #008000; font-weight: bold">auto</span> factory <span style="color: #666666">=</span> std<span style="color: #666666">::</span>make_unique<span style="color: #666666">&lt;</span>MacOSGUIFactory<span style="color: #666666">&gt;</span>();
+    <span style="color: #008000; font-weight: bold">auto</span> button <span style="color: #666666">=</span> factory<span style="color: #666666">-&gt;</span>createButton();
+    <span style="color: #008000; font-weight: bold">auto</span> textbox <span style="color: #666666">=</span> factory<span style="color: #666666">-&gt;</span>createTextBox();
+
+    button<span style="color: #666666">-&gt;</span>draw();
+    textbox<span style="color: #666666">-&gt;</span>draw();
+
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #666666">0</span>;
+}
+</pre></div>
+<p>Получили все те же плюсы паттерна Factory Method, только здесь мы подчеркиваем
+связность группы порождаемых объектов.</p>
+</div>
+        <hr>
+        <div id="footer">
+            <div id="menu">
+                <a href="#">Twitter</a>
+                <a href="#">Facebook</a>
+                <a href="#">Github</a>
+            </div>
+        </div>
+    </body>
+</html>
