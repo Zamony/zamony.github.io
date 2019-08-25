@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/awsm.css">
+    <title>Simple Factory, Factory Method и Abstract Factory</title>
+</head>
+<body>
+        <header>
+                <h1>Nikita Mochalov</h1>
+                <nav>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="https://github.com/Zamony">Github</a></li>
+                    </ul>
+                </nav>
+            </header>
+    <main>
+        <article>
+        <header>
+                <p>Август 2018</p>
+                <h1>Правка изменений в Git</h1>
+        </header>
+
+        <p>
+В Git часто бывает нужно исправить последствия неправильно выполненных действий.
+Например, изменить последний коммит, вернуться к какому-то моменту назад или перенести коммиты из одной ветки в другую.
+Рассмотрим, как это можно делать.
+</p>
+
+<h2>git checkout filename</h2>
+<p>
+Эта команда возвращает файл к состоянию последнего коммита
+</p>
+<h2>git commit --amend</h2>
+<p>
+Пусть в последний коммит не вошли какие-то файлы или сообщение коммита оказалось
+неверным. Тогда можно добавить/удалить необходимые файлы и выполнить <pre>git commit --amend</pre>
+Эта команда внесет необходимые изменения, да еще позволит изменить текст сообщения коммита.
+</p>
+
+<h2>git cherry-pick hash1 hash2 ...</h2>
+<p>
+Пусть мы делали изменения не в той ветке, в которой хотели. Тогда нужно перейти в ветку назначения и выполнить <pre>git cherry-pick</pre> для переноса коммитов по их хэшам.
+</p>
+
+<h2>reset (--soft, --mixed, --hard) hash</h2>
+<p>
+`--soft` - все изменения с коммита hash будут добавлены в Staging Area (как с помощью git add)
+</p>
+<p>
+`--mixed` - значение по умолчанию, все изменения будут отображаться как не добавленные в Staging Area
+</p>
+<p>
+`--hard` - будет все, как в коммите hash, только новые файлы буду отображаться как Untracked. Чтобы избавиться от них нужно выполнить `git clean -df`.
+</p>
+<h2>git revert hash1 hash2 ...</h2>
+<p>
+Данная команда создает коммит, обращающий коммит hash1. Затем создает коммит, обращающий коммит hash2 и т.д.
+Это единственная безопасная команда, меняющая историю, которая уже есть в remote.
+</p>
+
+<p>
+<strong>
+Для более полного ознакомления со всеми этими командами есть <a href="https://youtu.be/FdZecVxzJbk">видео на Youtube</a>
+</strong>
+</p>
+</article>
+</main>
+<footer>Nikita Mochalov</footer>
+</body>
+</html>
